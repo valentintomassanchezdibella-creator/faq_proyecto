@@ -6,3 +6,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 httpx
 groq
+python-multipart
