@@ -1,4 +1,4 @@
-const API = 'http://localhost:8000';
+const API = 'https://preguntas-frecuentes-castores.onrender.com';
 let historial = [];
 let esperando = false;
 
