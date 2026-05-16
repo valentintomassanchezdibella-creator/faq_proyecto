@@ -5,6 +5,11 @@ from routes.auth import solo_admin
 router = APIRouter()
 
 
+@router.get("/publico")
+def metricas_publicas():
+    result = supabase.table("metricas").select("id", count="exact").execute()
+    return { "total": result.count }
+
 @router.get("/", dependencies=[Depends(solo_admin)])
 def obtener_metricas():
     result = supabase.table("metricas").select("*").execute()

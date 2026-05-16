@@ -4,6 +4,8 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from config import supabase, SECRET_KEY
 from pydantic import BaseModel
+import httpx
+from config import SUPABASE_URL, SUPABASE_KEY
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -21,7 +23,7 @@ class TokenData(BaseModel):
 # --- Funciones internas ---
 def crear_token(data: dict):
     payload = data.copy()
-    payload["exp"] = datetime.now(datetime.timezone.utc) + timedelta(hours=TOKEN_EXPIRE_HOURS)
+    payload["exp"] = datetime.utcnow() + timedelta(hours=TOKEN_EXPIRE_HOURS)
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -85,15 +87,31 @@ def listar_usuarios():
 
 @router.post("/usuarios", dependencies=[Depends(solo_admin)])
 def crear_usuario(email: str, password: str, nombre: str, rol: str = "user"):
-    # Crear en Supabase Auth
-    try:
-        supabase.auth.admin.create_user({
+    # Crear en Supabase Auth via REST
+    res = httpx.post(
+        f"{SUPABASE_URL}/auth/v1/admin/users",
+        headers={
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
             "email": email,
             "password": password,
             "email_confirm": True
-        })
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error al crear usuario: {str(e)}")
+        }
+    )
+
+    if res.status_code not in (200, 201):
+        error = res.json()
+        msg = error.get("msg", "")
+        
+        if "validate email" in msg or "invalid format" in msg:
+            raise HTTPException(status_code=400, detail="El email ingresado no es válido")
+        elif "already registered" in msg or "A user with this email address has already been registered" in msg:
+            raise HTTPException(status_code=400, detail="Ya existe un usuario con ese email")
+        else:
+            raise HTTPException(status_code=400, detail="Error al crear usuario")
 
     # Registrar en tabla usuarios
     result = supabase.table("usuarios").insert({
@@ -104,8 +122,46 @@ def crear_usuario(email: str, password: str, nombre: str, rol: str = "user"):
 
     return result.data[0]
 
-
 @router.delete("/usuarios/{email}", dependencies=[Depends(solo_admin)])
-def eliminar_usuario(email: str):
+def eliminar_usuario(email: str, user: TokenData = Depends(verificar_token)):
+    if user.email == email:
+        raise HTTPException(status_code=400, detail="No podés eliminarte a vos mismo")
+
+    admins = supabase.table("usuarios").select("id").eq("rol", "admin").execute()
+    usuario_target = supabase.table("usuarios").select("rol").eq("email", email).execute()
+
+    if not usuario_target.data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    es_admin = usuario_target.data[0]["rol"] == "admin"
+    if es_admin and len(admins.data) <= 1:
+        raise HTTPException(status_code=400, detail="No podés eliminar el único admin del sistema")
+
+    # Buscar UUID en Supabase Auth
+    auth_users = httpx.get(
+        f"{SUPABASE_URL}/auth/v1/admin/users",
+        headers={
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}"
+        }
+    )
+
+    uuid = None
+    for u in auth_users.json().get("users", []):
+        if u["email"] == email:
+            uuid = u["id"]
+            break
+
+    # Eliminar de Supabase Auth
+    if uuid:
+        httpx.delete(
+            f"{SUPABASE_URL}/auth/v1/admin/users/{uuid}",
+            headers={
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}"
+            }
+        )
+
+    # Eliminar de tabla usuarios
     supabase.table("usuarios").delete().eq("email", email).execute()
     return {"mensaje": "Usuario eliminado"}

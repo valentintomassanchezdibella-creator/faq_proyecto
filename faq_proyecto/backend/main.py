@@ -6,7 +6,7 @@ app = FastAPI(title="ChatBot Escolar")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # después restringís a tu dominio
+    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500"],  # después restringís a tu dominio
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
