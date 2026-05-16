@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-supabase
-python-dotenv
-python-jose[cryptography]
-passlib[bcrypt]
-httpx
-groq
