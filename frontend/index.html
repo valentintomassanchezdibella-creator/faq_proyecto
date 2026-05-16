@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Escolar — E.E.S.T. N°6 Chacabuco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="estilos.css">
+  </head>
+  <body>
+    <header>
+      <div class="header-left">
+        <div class="bot-avatar">🏫</div>
+        <div class="bot-info">
+          <h1>Bot Escolar — Chacabuco</h1>
+          <p><span class="status-dot"></span>En línea · E.E.S.T. N°6</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="school-tag">Morón, Buenos Aires</span>
+        <button class="btn-clear" onclick="limpiarChat()">Nueva consulta</button>
+        <a href="./admin/index.html" style="padding:6px 12px; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius-sm); font-size:12px; text-decoration:none; transition:all 0.15s" onmouseover="this.style.color='white';this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.color='rgba(255,255,255,0.55)';this.style.background='rgba(255,255,255,0.08)'">Panel administrativo</a>
+      </div>
+    </header>
+
+    <div class="suggestions-bar" id="suggestions-bar">
+      <button class="suggestion-chip" onclick="enviarSugerencia(this.textContent)">¿Cuál es el horario?</button>
+      <button class="suggestion-chip" onclick="enviarSugerencia(this.textContent)">¿Dónde está la secretaría?</button>
+      <button class="suggestion-chip" onclick="enviarSugerencia(this.textContent)">¿Cómo me inscribo?</button>
+      <button class="suggestion-chip" onclick="enviarSugerencia(this.textContent)">¿Qué especialidades hay?</button>
+      <button class="suggestion-chip" onclick="enviarSugerencia(this.textContent)">¿Cuándo son los exámenes?</button>
+      <button class="suggestion-chip" onclick="enviarSugerencia(this.textContent)">¿Hay biblioteca?</button>
+    </div>
+
+    <div class="chat-area" id="chat-area">
+      <div class="welcome-card" id="welcome-card">
+        <div class="welcome-icon">🎓</div>
+        <h2>¡Hola! Soy el asistente virtual de la E.E.S.T. N°6 Chacabuco</h2>
+        <p>Podés preguntarme sobre horarios, inscripciones, especialidades, contactos y más información de la escuela.</p>
+        <div id="contador-consultas" style="font-size:13px; color:var(--text-muted); margin-bottom:1.25rem"></div>
+        <div class="welcome-chips">
+          <button class="welcome-chip" onclick="enviarSugerencia('¿Cuál es el horario de la escuela?')">⏰ Horarios</button>
+          <button class="welcome-chip" onclick="enviarSugerencia('¿Cómo me inscribo?')">📝 Inscripción</button>
+          <button class="welcome-chip" onclick="enviarSugerencia('¿Qué especialidades tiene la escuela?')">⚙️ Especialidades</button>
+          <button class="welcome-chip" onclick="enviarSugerencia('¿Cómo contacto a la escuela?')">📞 Contacto</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea
+          class="input-box"
+          id="input-msg"
+          placeholder="Escribí tu consulta sobre la escuela..."
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="btn-send" id="btn-send" onclick="enviarMensaje()">➤</button>
+      </div>
+      <div class="input-footer">Solo respondo preguntas sobre la E.E.S.T. N°6 Chacabuco</div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
