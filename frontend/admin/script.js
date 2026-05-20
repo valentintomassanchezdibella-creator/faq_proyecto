@@ -1,4 +1,4 @@
-const API = 'http://127.0.0.1:8000';
+const API = 'https://preguntas-frecuentes-castores.onrender.com';
 let token = localStorage.getItem('token') || '';
 let currentUser = null;
 let preguntasData = [];
