@@ -400,3 +400,53 @@ header {
   font-style: italic;
   color: var(--text-muted) !important;
 }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  /* Header */
+  header {
+    padding: 0 1rem;
+    height: auto;
+    min-height: 56px;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .school-tag { display: none; }
+
+  .bot-info h1 { font-size: 12px; }
+  .bot-info p  { font-size: 10px; }
+
+  .header-right { gap: 6px; }
+
+  .btn-clear,
+  .header-right a {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  /* Sugerencias */
+  .suggestions-bar { padding: 8px 1rem; }
+
+  /* Chat */
+  .chat-area { padding: 1rem; gap: 12px; }
+
+  /* Burbujas más anchas en mobile */
+  .msg-bubble { max-width: 88%; font-size: 13px; }
+  .error-badge { max-width: 88%; }
+
+  /* Welcome card */
+  .welcome-card {
+    max-width: 100%;
+    padding: 1.25rem 1rem;
+  }
+
+  .welcome-card h2 { font-size: 14px; }
+
+  /* Input */
+  .input-area { padding: 0.75rem 1rem; }
+  .input-box  { font-size: 13px; }
+  .input-footer { font-size: 10px; }
+}

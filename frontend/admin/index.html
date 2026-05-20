@@ -33,6 +33,7 @@
 
     <!-- APP -->
     <div id="app">
+      <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
       <nav class="sidebar">
         <div class="sidebar-brand">
           <div class="brand-name">E.E.S.T. N°6 Chacabuco</div>
@@ -67,7 +68,10 @@
 
       <div class="main">
         <div class="topbar">
-          <div class="topbar-title" id="topbar-title">Dashboard</div>
+          <div style="display:flex; align-items:center; gap:12px">
+            <button class="btn-hamburger" onclick="toggleSidebar()">☰</button>
+            <div class="topbar-title" id="topbar-title">Dashboard</div>
+          </div>
           <div class="topbar-actions">
             <span style="font-size:12px; color:var(--text-muted)">Bot Escolar</span>
           </div>
@@ -132,12 +136,12 @@
                 <table>
                   <thead>
                     <tr>
-                      <th style="width:40px">#</th>
-                      <th>Pregunta</th>
-                      <th>Respuesta</th>
-                      <th style="width:120px">Categoría</th>
-                      <th style="width:80px">Estado</th>
-                      <th style="width:100px">Acciones</th>
+                      <th style="width:4%">#</th>
+                      <th style="width:28%">Pregunta</th>
+                      <th style="width:38%">Respuesta</th>
+                      <th style="width:12%">Categoría</th>
+                      <th style="width:8%">Estado</th>
+                      <th style="width:10%">Acciones</th>
                     </tr>
                   </thead>
                   <tbody id="preguntas-tbody">
@@ -165,11 +169,11 @@
                 <table>
                   <thead>
                     <tr>
-                      <th>Nombre</th>
-                      <th>Email</th>
-                      <th style="width:100px">Rol</th>
-                      <th style="width:120px">Creado</th>
-                      <th style="width:80px">Acciones</th>
+                      <th style="width:20%">Nombre</th>
+                      <th style="width:40%">Email</th>
+                      <th style="width:15%">Rol</th>
+                      <th style="width:15%">Creado</th>
+                      <th style="width:10%">Acciones</th>
                     </tr>
                   </thead>
                   <tbody id="usuarios-tbody">

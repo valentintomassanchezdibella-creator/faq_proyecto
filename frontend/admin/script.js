@@ -7,11 +7,6 @@ let usuariosData = [];
 let currentPage = 1;
 const POR_PAGINA = 10;
 
-
-function toggleSidebar() {
-  document.querySelector('.sidebar').classList.toggle('open');
-}
-
 // ─── AUTH ─────────────────────────────────────
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
@@ -190,8 +185,8 @@ function renderPreguntas() {
     tbody.innerHTML = slice.map(p => `
       <tr>
         <td style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:12px">${p.id}</td>
-        <td><span class="text-truncate" title="${p.pregunta}">${p.pregunta}</span></td>
-        <td><span class="text-truncate" title="${p.respuesta}" style="color:var(--text-muted)">${p.respuesta}</span></td>
+        <td data-label="Pregunta">${p.pregunta}</td>
+        <td data-label="Respuesta"><span class="respuesta-preview" style="color:var(--text-muted)" onclick="this.classList.toggle('expandida')" title="Click para expandir">${p.respuesta}</span></td>
         <td>${p.categoria ? `<span class="badge badge-navy">${p.categoria}</span>` : '<span style="color:var(--text-light)">—</span>'}</td>
         <td><span class="badge ${p.activa ? 'badge-success' : 'badge-danger'}">${p.activa ? 'Activa' : 'Inactiva'}</span></td>
         <td>
@@ -271,6 +266,7 @@ async function guardarPregunta() {
     }
 
     closeModal('modal-pregunta');
+    await loadMetrics();
     toast(id ? 'Pregunta actualizada.' : 'Pregunta creada.', 'success');
     await loadPreguntas();
   } catch (e) {
@@ -286,6 +282,7 @@ async function togglePregunta(id) {
     const p = preguntasData.find(x => x.id === id);
     if (p) p.activa = data.activa;
     filterPreguntas();
+    await loadMetrics();
     toast(data.activa ? 'Pregunta activada.' : currentUser.rol === 'admin' ? 'Pregunta desactivada' : 'Pregunta desactivada <br> Recuerde que solo el admin puede eliminarla definitivamente', 'info');
   } catch (e) {
     toast('Error de conexión.', 'error');
@@ -305,6 +302,7 @@ async function eliminarPregunta(id) {
     if (!res || !res.ok) { toast('Error al eliminar.', 'error'); return; }
     preguntasData = preguntasData.filter(p => p.id !== id);
     filterPreguntas();
+    await loadMetrics();
     toast('Pregunta eliminada.', 'success');
   } catch (e) {
     toast('Error de conexión.', 'error');
@@ -328,7 +326,7 @@ async function loadUsuarios() {
     tbody.innerHTML = data.map(u => `
       <tr>
         <td>${u.nombre || '—'}</td>
-        <td style="color:var(--text-muted)">${u.email}</td>
+        <td data-label="Email" style="color:var(--text-muted)">${u.email}</td>
         <td><span class="badge ${u.rol === 'admin' ? 'badge-warning' : 'badge-info'}">${u.rol}</span></td>
         <td style="color:var(--text-muted);font-size:12px">${u.creado_en ? new Date(u.creado_en).toLocaleDateString('es-AR') : '—'}</td>
         <td>
@@ -507,4 +505,23 @@ if (token) {
       localStorage.removeItem('token');
     }
   });
+}
+
+
+// ─── SIDEBAR MOBILE ───────────────────────────
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+// Cerrar sidebar al navegar en mobile
+const originalShowPage = showPage;
+window.showPage = function(name) {
+  originalShowPage.call(this, name);
+  closeSidebar();
 }
