@@ -199,7 +199,7 @@
           </div>
           <div class="form-group" style="margin-bottom:1rem">
             <label>Respuesta</label>
-            <textarea id="edit-respuesta" placeholder="El horario es de 7:30 a 13:00hs." style="min-height:110px"></textarea>
+            <textarea id="edit-respuesta" placeholder="El horario es de 7:30 a 22:20hs." style="min-height:110px"></textarea>
           </div>
           <div class="form-group" style="margin-bottom:0">
             <label>Categoría</label>
@@ -217,22 +217,33 @@
     <div class="modal-overlay" id="modal-usuario">
       <div class="modal">
         <div class="modal-header">
-          <span class="modal-title">Nuevo usuario</span>
+          <span class="modal-title" id="modal-usuario-title">Nuevo usuario</span>
           <button class="modal-close" onclick="closeModal('modal-usuario')">✕</button>
         </div>
+
         <div class="modal-body">
+
+          <!-- ID oculto -->
+          <input type="hidden" id="edit-user-email-original">
+
           <div class="form-group" style="margin-bottom:1rem">
             <label>Nombre</label>
             <input type="text" id="new-nombre" placeholder="Juan Pérez">
           </div>
+
           <div class="form-group" style="margin-bottom:1rem">
             <label>Email</label>
             <input type="email" id="new-email" placeholder="usuario@escuela.com">
           </div>
+
           <div class="form-group" style="margin-bottom:1rem">
             <label>Contraseña</label>
             <input type="password" id="new-pass" placeholder="••••••••">
+            <small id="password-help" style="color:var(--text-muted)">
+              Dejá vacío para no cambiarla
+            </small>
           </div>
+
           <div class="form-group" style="margin-bottom:0">
             <label>Rol</label>
             <select id="new-rol">
@@ -240,10 +251,17 @@
               <option value="admin">Administrador</option>
             </select>
           </div>
+
         </div>
+
         <div class="modal-footer">
-          <button class="btn-cancel" onclick="closeModal('modal-usuario')">Cancelar</button>
-          <button class="btn-save" onclick="crearUsuario()">Crear usuario</button>
+          <button class="btn-cancel" onclick="closeModal('modal-usuario')">
+            Cancelar
+          </button>
+
+          <button class="btn-save" id="btn-guardar-usuario">
+            Guardar
+          </button>
         </div>
       </div>
     </div>

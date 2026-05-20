@@ -19,6 +19,11 @@ class TokenData(BaseModel):
     email: str
     rol: str
 
+class UsuarioActualizar(BaseModel):
+    nombre: str | None = None
+    rol: str | None = None
+    email: str | None = None
+    password: str | None = None
 
 # --- Funciones internas ---
 def crear_token(data: dict):
@@ -121,6 +126,128 @@ def crear_usuario(email: str, password: str, nombre: str, rol: str = "user"):
     }).execute()
 
     return result.data[0]
+
+
+@router.put("/usuarios/{email}", dependencies=[Depends(solo_admin)])
+def actualizar_usuario(
+    email: str,
+    datos: UsuarioActualizar,
+    user: TokenData = Depends(verificar_token)
+):
+    # Buscar usuario actual
+    usuario_target = supabase.table("usuarios") \
+        .select("*") \
+        .eq("email", email) \
+        .execute()
+
+    if not usuario_target.data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    usuario_target = usuario_target.data[0]
+
+    # Evitar quitar el último admin
+    if datos.rol and datos.rol != "admin":
+
+        admins = supabase.table("usuarios") \
+            .select("id") \
+            .eq("rol", "admin") \
+            .execute()
+
+        if (
+            usuario_target["rol"] == "admin"
+            and len(admins.data) <= 1
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="Debe existir al menos un admin"
+            )
+
+    # Evitar auto-democión
+    if (
+        user.email == email
+        and datos.rol
+        and datos.rol != "admin"
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="No podés quitarte tu propio rol admin"
+        )
+
+    nuevo_email = datos.email
+
+    # Buscar UUID en Supabase Auth
+    auth_users = httpx.get(
+        f"{SUPABASE_URL}/auth/v1/admin/users",
+        headers={
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}"
+        }
+    )
+
+    uuid = None
+
+    for u in auth_users.json().get("users", []):
+        if u["email"] == email:
+            uuid = u["id"]
+            break
+
+    # Actualizar Auth
+    if uuid:
+
+        auth_data = {}
+
+        if datos.email:
+            auth_data["email"] = datos.email
+
+        if datos.password:
+            auth_data["password"] = datos.password
+
+        if auth_data:
+
+            res = httpx.put(
+                f"{SUPABASE_URL}/auth/v1/admin/users/{uuid}",
+                headers={
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json=auth_data
+            )
+
+            if res.status_code not in (200, 201):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Error actualizando credenciales"
+                )
+
+    # Campos para tabla usuarios
+    campos = {
+        "nombre": datos.nombre,
+        "rol": datos.rol
+    }
+
+    if datos.email:
+        campos["email"] = datos.email
+
+    campos = {
+        k: v
+        for k, v in campos.items()
+        if v is not None
+    }
+
+    if not campos:
+        raise HTTPException(
+            status_code=400,
+            detail="No se enviaron cambios"
+        )
+
+    result = supabase.table("usuarios") \
+        .update(campos) \
+        .eq("email", email) \
+        .execute()
+
+    return result.data[0]
+
 
 @router.delete("/usuarios/{email}", dependencies=[Depends(solo_admin)])
 def eliminar_usuario(email: str, user: TokenData = Depends(verificar_token)):

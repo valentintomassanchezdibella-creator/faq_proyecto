@@ -24,10 +24,18 @@ class PreguntaActualizar(BaseModel):
 # --- Endpoints públicos (el chatbot los usa) ---
 
 @router.get("/")
-def listar_preguntas(pagina: int = 1, por_pagina: int = 10, categoria: Optional[str] = None):
+def listar_preguntas(
+    pagina: int = 1,
+    por_pagina: int = 10,
+    categoria: Optional[str] = None,
+    incluir_inactivas: bool = False
+):
     offset = (pagina - 1) * por_pagina
 
-    query = supabase.table("preguntas").select("*", count="exact").eq("activa", True)
+    query = supabase.table("preguntas").select("*", count="exact").order("id")
+
+    if not incluir_inactivas:
+        query = query.eq("activa", True)
 
     if categoria:
         query = query.eq("categoria", categoria)
@@ -39,9 +47,8 @@ def listar_preguntas(pagina: int = 1, por_pagina: int = 10, categoria: Optional[
         "total": result.count,
         "pagina": pagina,
         "por_pagina": por_pagina,
-        "paginas_totales": -(-result.count // por_pagina)  # ceil division
+        "paginas_totales": -(-result.count // por_pagina)
     }
-
 
 @router.get("/categorias")
 def listar_categorias():

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from config import supabase
-from routes.auth import solo_admin
+from routes.auth import verificar_token
 
 router = APIRouter()
 
@@ -10,7 +10,7 @@ def metricas_publicas():
     result = supabase.table("metricas").select("id", count="exact").execute()
     return { "total": result.count }
 
-@router.get("/", dependencies=[Depends(solo_admin)])
+@router.get("/", dependencies=[Depends(verificar_token)])
 def obtener_metricas():
     result = supabase.table("metricas").select("*").execute()
     datos = result.data
@@ -45,9 +45,3 @@ def obtener_metricas():
         "tasa_respuesta": round((respondidas / total) * 100, 1),
         "consultas_frecuentes": frecuentes
     }
-
-
-@router.delete("/", dependencies=[Depends(solo_admin)])
-def limpiar_metricas():
-    supabase.table("metricas").delete().neq("id", 0).execute()
-    return {"mensaje": "Métricas limpiadas"}

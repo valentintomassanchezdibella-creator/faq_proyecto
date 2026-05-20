@@ -1,10 +1,16 @@
-const API = 'https://preguntas-frecuentes-castores.onrender.com';
+const API = 'http://127.0.0.1:8000';
 let token = localStorage.getItem('token') || '';
 let currentUser = null;
 let preguntasData = [];
 let filteredData = [];
+let usuariosData = [];
 let currentPage = 1;
 const POR_PAGINA = 10;
+
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
 
 // ─── AUTH ─────────────────────────────────────
 async function doLogin() {
@@ -25,7 +31,7 @@ async function doLogin() {
     token = data.access_token;
     localStorage.setItem('token', token);
     currentUser = { email, rol: data.rol, nombre: data.nombre || email.split('@')[0] };
-    initApp();
+    location.reload();
   } catch (e) {
     errEl.textContent = e.message || 'Credenciales incorrectas.';
     errEl.style.display = 'block';
@@ -134,7 +140,7 @@ function renderFrecuentes(lista) {
 // ─── PREGUNTAS ────────────────────────────────
 async function loadPreguntas() {
   try {
-    const res = await apiFetch('/preguntas/?por_pagina=1000');
+    const res = await apiFetch('/preguntas?incluir_inactivas=true&por_pagina=1000');
     if (!res || !res.ok) return;
     const data = await res.json();
     preguntasData = data.datos;
@@ -192,7 +198,7 @@ function renderPreguntas() {
           <div class="action-btns">
             <button class="btn-icon" title="Editar" onclick="openModalEditar(${p.id})">✏️</button>
             <button class="btn-icon success" title="${p.activa ? 'Desactivar' : 'Activar'}" onclick="togglePregunta(${p.id})">${p.activa ? '🔇' : '✅'}</button>
-            <button class="btn-icon danger" title="Eliminar" onclick="confirmarEliminar(${p.id}, '${p.pregunta.replace(/'/g, "\\'")}')">🗑️</button>
+            ${currentUser.rol === 'admin' ? `<button class="btn-icon danger" title="Eliminar" onclick="confirmarEliminar(${p.id}, '${p.pregunta.replace(/'/g, "\\'")}')">🗑️</button>` : ""}
           </div>
         </td>
       </tr>
@@ -280,7 +286,7 @@ async function togglePregunta(id) {
     const p = preguntasData.find(x => x.id === id);
     if (p) p.activa = data.activa;
     filterPreguntas();
-    toast(data.activa ? 'Pregunta activada.' : 'Pregunta desactivada.', 'info');
+    toast(data.activa ? 'Pregunta activada.' : currentUser.rol === 'admin' ? 'Pregunta desactivada' : 'Pregunta desactivada <br> Recuerde que solo el admin puede eliminarla definitivamente', 'info');
   } catch (e) {
     toast('Error de conexión.', 'error');
   }
@@ -317,6 +323,7 @@ async function loadUsuarios() {
       tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Sin usuarios registrados.</p></div></td></tr>';
       return;
     }
+    usuariosData = data;
 
     tbody.innerHTML = data.map(u => `
       <tr>
@@ -325,7 +332,10 @@ async function loadUsuarios() {
         <td><span class="badge ${u.rol === 'admin' ? 'badge-warning' : 'badge-info'}">${u.rol}</span></td>
         <td style="color:var(--text-muted);font-size:12px">${u.creado_en ? new Date(u.creado_en).toLocaleDateString('es-AR') : '—'}</td>
         <td>
-          <button class="btn-icon danger" title="Eliminar" onclick="confirmarEliminarUser('${u.email}')">🗑️</button>
+          <div class="action-btns">
+            <button class="btn-icon " title="Editar" onclick="openModalEditarUser('${u.email}')">✏️</button>
+            <button class="btn-icon danger" title="Eliminar" onclick="confirmarEliminarUser('${u.email}')">🗑️</button>
+          </div>
         </td>
       </tr>
     `).join('');
@@ -334,27 +344,115 @@ async function loadUsuarios() {
   }
 }
 
-function openModalUsuario() { openModal('modal-usuario'); }
 
-async function crearUsuario() {
+function openModalUsuario() {
+  document.getElementById('modal-usuario-title').textContent = 'Nuevo usuario';
+  document.getElementById('password-help').style.display = 'none';
+
+  document.getElementById('edit-user-email-original').value = '';
+
+  document.getElementById('new-nombre').value = '';
+  document.getElementById('new-email').value = '';
+  document.getElementById('new-pass').value = '';
+  document.getElementById('new-rol').value = 'user';
+
+  document.getElementById('btn-guardar-usuario').onclick = guardarUsuario;
+
+  openModal('modal-usuario');
+}
+
+function openModalEditarUser(email) {
+  const u = usuariosData.find(x => x.email === email);
+  document.getElementById('password-help').style.display = 'block';
+
+  if (!u) return;
+
+  document.getElementById('modal-usuario-title').textContent = 'Editar usuario';
+
+  document.getElementById('edit-user-email-original').value = u.email;
+
+  document.getElementById('new-nombre').value = u.nombre || '';
+  document.getElementById('new-email').value = u.email;
+  document.getElementById('new-pass').value = '';
+  document.getElementById('new-rol').value = u.rol;
+
+  document.getElementById('btn-guardar-usuario').onclick = guardarUsuario;
+
+  openModal('modal-usuario');
+}
+
+async function guardarUsuario() {
+  const emailOriginal = document.getElementById('edit-user-email-original').value;
+
   const nombre = document.getElementById('new-nombre').value.trim();
-  const email  = document.getElementById('new-email').value.trim();
-  const pass   = document.getElementById('new-pass').value;
-  const rol    = document.getElementById('new-rol').value;
+  const email = document.getElementById('new-email').value.trim();
+  const password = document.getElementById('new-pass').value;
+  const rol = document.getElementById('new-rol').value;
 
-  if (!email || !pass) { toast('Completá email y contraseña.', 'error'); return; }
+  if (!email) {
+    toast('Completá el email.', 'error');
+    return;
+  }
 
   try {
-    const params = new URLSearchParams({ email, password: pass, nombre, rol });
-    const res = await apiFetch(`/auth/usuarios?${params}`, { method: 'POST' });
-    if (!res || !res.ok) {
-      const err = await res.json();
-      toast(err.detail || 'Error al crear usuario.', 'error');
-      return;
+
+    // CREAR
+    if (!emailOriginal) {
+
+      if (!password) {
+        toast('Completá la contraseña.', 'error');
+        return;
+      }
+
+      const params = new URLSearchParams({
+        email,
+        password,
+        nombre,
+        rol
+      });
+
+      const res = await apiFetch(`/auth/usuarios?${params}`, {
+        method: 'POST'
+      });
+
+      if (!res || !res.ok) {
+        const err = await res.json();
+        toast(err.detail || 'Error al crear usuario.', 'error');
+        return;
+      }
+
+      toast('Usuario creado correctamente.', 'success');
+
+    } else {
+
+      // EDITAR
+      const res = await apiFetch(`/auth/usuarios/${emailOriginal}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          email,
+          nombre,
+          password: password || null,
+          rol
+        })
+      });
+
+      if (!res || !res.ok) {
+        const err = await res.json();
+        toast(err.detail || 'Error al actualizar.', 'error');
+        return;
+      }
+
+      toast('Usuario actualizado.', 'success');
+      if (emailOriginal === currentUser.email) {
+        currentUser.nombre = nombre;
+        document.getElementById('sidebar-name').textContent = nombre || email.split('@')[0];
+      }
     }
+
     closeModal('modal-usuario');
-    toast('Usuario creado correctamente.', 'success');
+
     loadUsuarios();
+
   } catch (e) {
     toast('Error de conexión.', 'error');
   }
