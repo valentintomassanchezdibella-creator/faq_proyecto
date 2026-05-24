@@ -48,9 +48,10 @@ function initApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
 
+
   const n = currentUser.nombre;
   document.getElementById('sidebar-name').textContent = n;
-  document.getElementById('sidebar-avatar').textContent = n[0].toUpperCase();
+  document.getElementById('sidebar-avatar').innerHTML = `<img src="../imagenes/usuario.jpeg" class="avatar-img" alt="vos">`;
   document.getElementById('sidebar-role').textContent = currentUser.rol === 'admin' ? 'Administrador' : 'Usuario';
   document.getElementById('rol-badge').textContent = currentUser.rol === 'admin' ? 'Admin' : 'User';
 

@@ -874,6 +874,7 @@ table {
 
 .respuesta-preview {
   display: -webkit-box;
+  line-clamp: 1;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -883,6 +884,7 @@ table {
 
 .respuesta-preview.expandida {
   display: block;
+  line-clamp: 1;
   -webkit-line-clamp: unset;
   overflow: visible;
 }
@@ -942,4 +944,12 @@ table {
   }
 
   td { white-space: normal; word-break: break-word; }
+}
+
+.user-avatar img.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }

@@ -7,3 +7,4 @@ passlib[bcrypt]
 httpx
 groq
 python-multipart
+rapidfuzz

@@ -28,29 +28,6 @@ function ocultarWelcome() {
   if (w) w.remove();
 }
 
-function agregarMensaje(texto, tipo, sinRespuesta = false) {
-  const area = document.getElementById('chat-area');
-  const div  = document.createElement('div');
-  div.className = `msg ${tipo}`;
-
-  const avatar = tipo === 'bot'
-    ? `<div class="msg-avatar">🏫</div>`
-    : `<div class="msg-avatar">Vos</div>`;
-
-  const bubbleClass = sinRespuesta ? 'msg-bubble no-answer' : 'msg-bubble';
-
-  div.innerHTML = `
-    ${avatar}
-    <div class="msg-wrap">
-      <div class="${bubbleClass}">${texto}</div>
-      <div class="msg-time">${hora()}</div>
-    </div>
-  `;
-  area.appendChild(div);
-  scrollAbajo();
-  return div;
-}
-
 function agregarTyping() {
   const area = document.getElementById('chat-area');
   const div  = document.createElement('div');
@@ -101,9 +78,7 @@ async function enviarMensaje() {
   esperando = true;
 
   agregarMensaje(texto, 'user');
-
   historial.push({ role: 'user', content: texto });
-
   agregarTyping();
 
   try {
@@ -118,11 +93,80 @@ async function enviarMensaje() {
     if (!res.ok) {
       const err = await res.json();
       agregarError(err.detail || 'Error al procesar la consulta.');
-    } else {
-      const data = await res.json();
-      agregarMensaje(data.respuesta, 'bot', !data.respondida);
-      historial.push({ role: 'assistant', content: data.respuesta });
+      document.getElementById('btn-send').disabled = false;
+      esperando = false;
+      input.focus();
+      return;
     }
+
+    const data = await res.json();
+
+    // Crear burbuja
+    const area = document.getElementById('chat-area');
+    const div = document.createElement('div');
+    div.className = 'msg bot';
+    div.innerHTML = `
+      <div class="msg-avatar">
+        <img src="./imagenes/bot-hablando.png" class="avatar-img" alt="bot">
+      </div>
+      <div class="msg-wrap">
+        <div class="${data.respondida ? 'msg-bubble' : 'msg-bubble no-answer'}">
+          <span class="texto-visible"></span><span class="texto-fantasma" style="opacity:0">${data.respuesta}</span>
+        </div>
+        <div class="msg-time">${hora()}</div>
+      </div>
+    `;
+    area.appendChild(div);
+    scrollAbajo();
+
+    const visible  = div.querySelector('.texto-visible');
+    const fantasma = div.querySelector('.texto-fantasma');
+    const avatar   = div.querySelector('.avatar-img');
+    const palabras = data.respuesta.split(' ');
+
+    // Índices: palabra actual y letra dentro de esa palabra
+    let iPalabra = 0;
+    let iLetra   = 0;
+
+    function escribir() {
+      if (iPalabra >= palabras.length) {
+        fantasma.textContent = '';
+        avatar.src = './imagenes/bot-normal.png';
+        return;
+      }
+
+      const palabraActual = palabras[iPalabra];
+
+      if (iLetra <= palabraActual.length) {
+        // Escribiendo letras → icono hablando
+        avatar.src = './imagenes/bot-hablando.png';
+
+        const anteriores = iPalabra > 0
+          ? palabras.slice(0, iPalabra).join(' ') + ' '
+          : '';
+        visible.textContent = anteriores + palabraActual.slice(0, iLetra);
+
+        const restoActual = palabraActual.slice(iLetra);
+        const siguientes  = iPalabra + 1 < palabras.length
+          ? ' ' + palabras.slice(iPalabra + 1).join(' ')
+          : '';
+        fantasma.textContent = restoActual + siguientes;
+
+        iLetra++;
+        scrollAbajo();
+        setTimeout(escribir, 30);
+      } else {
+        // Pausa entre palabras → icono normal
+        avatar.src = './imagenes/bot-normal.png';
+        iPalabra++;
+        iLetra = 0;
+        setTimeout(escribir, 60);
+      }
+    }
+
+    escribir();
+    historial.push({ role: 'assistant', content: data.respuesta });
+
   } catch (e) {
     quitarTyping();
     agregarError('No se pudo conectar con el servidor. Intentá de nuevo en un momento.');
@@ -133,27 +177,55 @@ async function enviarMensaje() {
   input.focus();
 }
 
+function agregarTyping() {
+  const area = document.getElementById('chat-area');
+  const div  = document.createElement('div');
+  div.className = 'typing-indicator';
+  div.id = 'typing';
+  div.innerHTML = `
+    <div class="msg-avatar">
+      <img src="./imagenes/bot-pensando.png" class="avatar-img" alt="bot">
+    </div>
+    <div class="typing-bubble">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  `;
+  area.appendChild(div);
+  scrollAbajo();
+}
+
+function agregarMensaje(texto, tipo, sinRespuesta = false) {
+  const area = document.getElementById('chat-area');
+  const div  = document.createElement('div');
+  div.className = `msg ${tipo}`;
+
+  const avatar = tipo === 'bot'
+    ? `<div class="msg-avatar"><img src="./imagenes/bot-normal.png" class="avatar-img" alt="bot"></div>`
+    : `<div class="msg-avatar"><img src="./imagenes/usuario.jpeg" class="avatar-img" alt="vos"></div>`;
+
+  const bubbleClass = sinRespuesta ? 'msg-bubble no-answer' : 'msg-bubble';
+
+  div.innerHTML = `
+    ${avatar}
+    <div class="msg-wrap">
+      <div class="${bubbleClass}">${texto}</div>
+      <div class="msg-time">${hora()}</div>
+    </div>
+  `;
+  area.appendChild(div);
+  scrollAbajo();
+  return div;
+}
+
 function enviarSugerencia(texto) {
   document.getElementById('input-msg').value = texto;
   enviarMensaje();
 }
 
 function limpiarChat() {
-  historial = [];
-  const area = document.getElementById('chat-area');
-  area.innerHTML = `
-    <div class="welcome-card" id="welcome-card">
-      <div class="welcome-icon">🎓</div>
-      <h2>¡Hola! Soy el asistente virtual de la E.E.S.T. N°6 Chacabuco</h2>
-      <p>Podés preguntarme sobre horarios, inscripciones, especialidades, contactos y más información de la escuela.</p>
-      <div class="welcome-chips">
-        <button class="welcome-chip" onclick="enviarSugerencia('¿Cuál es el horario de la escuela?')">⏰ Horarios</button>
-        <button class="welcome-chip" onclick="enviarSugerencia('¿Cómo me inscribo?')">📝 Inscripción</button>
-        <button class="welcome-chip" onclick="enviarSugerencia('¿Qué especialidades tiene la escuela?')">⚙️ Especialidades</button>
-        <button class="welcome-chip" onclick="enviarSugerencia('¿Cómo contacto a la escuela?')">📞 Contacto</button>
-      </div>
-    </div>
-  `;
+  location.reload();
 }
 
 async function loadContador() {
