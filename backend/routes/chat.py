@@ -78,7 +78,7 @@ REGLAS ESTRICTAS
 "Solo puedo responder preguntas sobre la E.E.S.T. N°6 Chacabuco."
 
 4. Si la pregunta está relacionada con la escuela pero la respuesta NO aparece en el contexto, respondé EXACTAMENTE:
-"No tengo información sobre eso. Te recomiendo consultar directamente en secretaría."
+"No tengo información sobre eso."
 
 5. Si el contexto es insuficiente:
 - NO deduzcas
@@ -115,7 +115,7 @@ USUARIO:
 ¿Cuándo empiezan las vacaciones?
 
 ASISTENTE:
-No tengo información sobre eso. Te recomiendo consultar directamente en secretaría.
+No tengo información sobre eso.
 
 ========================
 CONTEXTO
@@ -195,7 +195,7 @@ def chat(consulta: Consulta):
             model="llama-3.1-8b-instant",
             messages=mensajes,
             max_tokens=500,
-            temperature=0.1,
+            temperature=0.7,
             top_p=0.9
         )
         respuesta = response.choices[0].message.content
