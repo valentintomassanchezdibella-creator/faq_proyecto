@@ -1,7 +1,9 @@
 :root {
-  --navy: #13293d;
-  --navy-mid: #1b3b5a;
-  --navy-light: #315d8a;
+
+  --navy: #1e3a5f;
+  --navy-mid: #2d5282;
+  --navy-light: #4a7fb5;
+  --bubble-user: #2d5282;
   --gold:       #c8982a;
   --gold-light: #f0c75e;
   --bg:         #f0f3fa;
@@ -11,7 +13,6 @@
   --text-muted: #5a6a8a;
   --text-light: #8a9abf;
   --bubble-bot: #ffffff;
-  --bubble-user:#0f2044;
   --radius:     16px;
   --radius-sm:  8px;
 }
@@ -23,10 +24,10 @@ body {
   background:
     linear-gradient(
       180deg,
-      #07171d 0%,
-      #0f3d3e 35%,
-      #164e63 70%,
-      #1e293b 100%
+      #1a2f4a 0%,
+      #1e4060 35%,
+      #2a5f7a 70%,
+      #1e3a5f 100%
     );
   color: var(--text);
   height: 100dvh;
@@ -39,8 +40,8 @@ body {
 header {
   background: linear-gradient(
   180deg,
-  #07171d,
-  #0f2044
+    #1a2f4a,
+    #1e3a5f
 );;
   padding: 0 1.5rem;
   height: 60px;
@@ -126,8 +127,8 @@ header {
 .suggestions-bar {
   background: linear-gradient(
   180deg,
-  #0f2044 0%,
-  #12394f 100%
+  #1e3a5f 0%,
+  #1e4a5a 100%
 );
   padding: 10px 1.5rem;
   display: flex;
@@ -330,8 +331,8 @@ header {
   background:
     linear-gradient(
       135deg,
-      #1b3b5a,
-      #315d8a
+      #2d5282,
+      #4a7fb5
     );
 
   box-shadow:
@@ -463,8 +464,8 @@ header {
 .input-area {
   background: linear-gradient(
   180deg,
-  rgba(15,61,62,.75),
-  rgba(7,23,29,.95)
+  rgba(30,64,96,.75),
+  rgba(26,47,74,.95)
 );
 
 backdrop-filter: blur(10px);
@@ -504,8 +505,8 @@ backdrop-filter: blur(10px);
   width: 42px; height: 42px;
   background: linear-gradient(
       135deg,
-      #1b3b5a,
-      #315d8a
+      #2d5282,
+      #4a7fb5
     );
   border: none;
   border-radius: 50%;
@@ -518,7 +519,7 @@ backdrop-filter: blur(10px);
   font-size: 18px;
 }
 
-.btn-send:hover { background: #12394f; transform: scale(1.2); }
+.btn-send:hover { background: #2d5282; transform: scale(1.2); }
 .btn-send:active { transform: scale(0.97); }
 .btn-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
