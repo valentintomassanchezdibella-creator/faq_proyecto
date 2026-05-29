@@ -1,8 +1,8 @@
-# 🏫 Bot FAQ — E.E.S.T. N°6 Chacabuco
+# Bot FAQ — E.E.S.T. N°6 Chacabuco
 
 Bot de preguntas frecuentes con IA para la Escuela Técnica N°6 Chacabuco de Morón, Buenos Aires.
 
-## 🔗 Links
+## Links
 
 - **Chatbot público:** https://preguntas-frecuentes-castores.netlify.app
 - **Panel administrativo:** https://preguntas-frecuentes-castores.netlify.app/admin/
@@ -10,7 +10,7 @@ Bot de preguntas frecuentes con IA para la Escuela Técnica N°6 Chacabuco de Mo
 
 ---
 
-## 🛠 Stack
+## Stack
 
 | Capa | Tecnología |
 |------|-----------|
@@ -23,7 +23,7 @@ Bot de preguntas frecuentes con IA para la Escuela Técnica N°6 Chacabuco de Mo
 
 ---
 
-## 📁 Estructura
+## Estructura
 
 ```
 faq_proyecto/
@@ -49,7 +49,7 @@ faq_proyecto/
 
 ---
 
-## ⚙️ Instalación local
+## Instalación local
 
 ### 1. Clonar el repositorio
 
@@ -93,7 +93,7 @@ Abrir `http://localhost:5500` en el navegador.
 
 ---
 
-## 🗄 Base de datos
+## Base de datos
 
 Ejecutar en el SQL Editor de Supabase:
 
@@ -125,7 +125,7 @@ CREATE TABLE usuarios (
 
 ---
 
-## 🚀 Deploy
+## Deploy
 
 ### Backend (Render)
 - Root Directory: `backend`
@@ -139,7 +139,7 @@ CREATE TABLE usuarios (
 
 ---
 
-## 📋 Endpoints principales
+## Endpoints principales
 
 | Método | Endpoint | Auth | Descripción |
 |--------|----------|------|-------------|
@@ -153,7 +153,7 @@ CREATE TABLE usuarios (
 
 ---
 
-## 👤 Roles
+## Roles
 
 | Rol | Permisos |
 |-----|---------|
@@ -163,12 +163,8 @@ CREATE TABLE usuarios (
 
 ---
 
-## 📄 Documentación
+## Documentación
 
 Ver carpeta `/docs` del repositorio:
 - `Manual_Tecnico.docx` — Arquitectura, API y deploy
 - `Manual_Usuario.docx` — Guía de uso del sistema
-
----
-
-*Proyecto desarrollado para la materia de Implementación de Sitios Web Dinámicos — Prof. Pedro Javier Salinas*
