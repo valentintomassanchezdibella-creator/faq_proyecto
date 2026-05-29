@@ -175,7 +175,7 @@ def chat(consulta: Consulta):
     if not buscar_pregunta_relevante(consulta.mensaje, preguntas):
         guardar_metrica(consulta.mensaje, False)
         return {
-            "respuesta": "No tengo información sobre eso. Te recomiendo consultar directamente en secretaría.",
+            "respuesta": "No tengo información sobre eso.",
             "respondida": False
         }
 
@@ -195,7 +195,7 @@ def chat(consulta: Consulta):
             model="llama-3.1-8b-instant",
             messages=mensajes,
             max_tokens=500,
-            temperature=0.4,
+            temperature=0.3,
             top_p=0.9
         )
         respuesta = response.choices[0].message.content
