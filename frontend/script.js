@@ -28,23 +28,6 @@ function ocultarWelcome() {
   if (w) w.remove();
 }
 
-function agregarTyping() {
-  const area = document.getElementById('chat-area');
-  const div  = document.createElement('div');
-  div.className = 'typing-indicator';
-  div.id = 'typing';
-  div.innerHTML = `
-    <div class="msg-avatar bot-avatar" style="width:30px;height:30px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:2px">🏫</div>
-    <div class="typing-bubble">
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-    </div>
-  `;
-  area.appendChild(div);
-  scrollAbajo();
-}
-
 function quitarTyping() {
   const t = document.getElementById('typing');
   if (t) t.remove();
@@ -55,7 +38,7 @@ function agregarError(msg) {
   const div  = document.createElement('div');
   div.className = 'msg bot';
   div.innerHTML = `
-    <div class="msg-avatar">🏫</div>
+    <div class="msg-avatar"><img src="./imagenes/bot-normal.jpeg" class="avatar-img" alt="bot"></div>
     <div class="msg-wrap">
       <div class="error-badge">⚠️ ${msg}</div>
       <div class="msg-time">${hora()}</div>
@@ -107,7 +90,7 @@ async function enviarMensaje() {
     div.className = 'msg bot';
     div.innerHTML = `
       <div class="msg-avatar">
-        <img src="./imagenes/bot-hablando.png" class="avatar-img" alt="bot">
+        <img src="./imagenes/bot-hablando.jpeg" class="avatar-img" alt="bot">
       </div>
       <div class="msg-wrap">
         <div class="${data.respondida ? 'msg-bubble' : 'msg-bubble no-answer'}">
@@ -122,6 +105,7 @@ async function enviarMensaje() {
     const visible  = div.querySelector('.texto-visible');
     const fantasma = div.querySelector('.texto-fantasma');
     const avatar   = div.querySelector('.avatar-img');
+    const avatarWrap = div.querySelector('.msg-avatar');
     const palabras = data.respuesta.split(' ');
 
     // Índices: palabra actual y letra dentro de esa palabra
@@ -130,8 +114,10 @@ async function enviarMensaje() {
 
     function escribir() {
       if (iPalabra >= palabras.length) {
+        avatarWrap.classList.remove('hablando');
+        avatarWrap.classList.remove('pensando');
         fantasma.textContent = '';
-        avatar.src = './imagenes/bot-normal.png';
+        avatar.src = './imagenes/bot-normal.jpeg';
         return;
       }
 
@@ -139,7 +125,10 @@ async function enviarMensaje() {
 
       if (iLetra <= palabraActual.length) {
         // Escribiendo letras → icono hablando
-        avatar.src = './imagenes/bot-hablando.png';
+        avatar.src = './imagenes/bot-hablando.jpeg';
+
+        avatarWrap.classList.remove('pensando');
+        avatarWrap.classList.add('hablando');
 
         const anteriores = iPalabra > 0
           ? palabras.slice(0, iPalabra).join(' ') + ' '
@@ -157,7 +146,8 @@ async function enviarMensaje() {
         setTimeout(escribir, 30);
       } else {
         // Pausa entre palabras → icono normal
-        avatar.src = './imagenes/bot-normal.png';
+        avatar.src = './imagenes/bot-normal.jpeg';
+        avatarWrap.classList.remove('hablando');
         iPalabra++;
         iLetra = 0;
         setTimeout(escribir, 60);
@@ -183,8 +173,8 @@ function agregarTyping() {
   div.className = 'typing-indicator';
   div.id = 'typing';
   div.innerHTML = `
-    <div class="msg-avatar">
-      <img src="./imagenes/bot-pensando.png" class="avatar-img" alt="bot">
+    <div class="msg-avatar pensando">
+      <img src="./imagenes/bot-pensando.jpeg" class="avatar-img" alt="bot">
     </div>
     <div class="typing-bubble">
       <div class="typing-dot"></div>
@@ -202,7 +192,7 @@ function agregarMensaje(texto, tipo, sinRespuesta = false) {
   div.className = `msg ${tipo}`;
 
   const avatar = tipo === 'bot'
-    ? `<div class="msg-avatar"><img src="./imagenes/bot-normal.png" class="avatar-img" alt="bot"></div>`
+    ? `<div class="msg-avatar"><img src="./imagenes/bot-normal.jpeg" class="avatar-img" alt="bot"></div>`
     : `<div class="msg-avatar"><img src="./imagenes/usuario.jpeg" class="avatar-img" alt="vos"></div>`;
 
   const bubbleClass = sinRespuesta ? 'msg-bubble no-answer' : 'msg-bubble';

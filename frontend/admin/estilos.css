@@ -946,6 +946,11 @@ table {
   td { white-space: normal; word-break: break-word; }
 }
 
+.user-avatar{
+  width: 60px;
+  height: 60px;
+}
+
 .user-avatar img.avatar-img {
   width: 100%;
   height: 100%;

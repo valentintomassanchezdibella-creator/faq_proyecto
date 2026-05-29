@@ -31,7 +31,7 @@ def guardar_metrica(consulta: str, respondida: bool):
 
 
 def construir_system_prompt(contexto: str) -> str:
-    return f"""Sos el asistente virtual oficial de la Escuela Técnica N°6 Chacabuco de Morón, Buenos Aires. Tu nombre es "Cell".
+    return f"""Sos el asistente virtual oficial de la Escuela Técnica N°6 Chacabuco de Morón, Buenos Aires. Tu nombre es "Chaca-Chan".
 
 PERSONALIDAD:
 - Hablás de forma amable, cercana y en español rioplatense (usás "vos", "te", "podés").
@@ -116,10 +116,10 @@ def chat(consulta: Consulta):
     # Llamar a Groq
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=mensajes,
             max_tokens=500,
-            temperature=0.3
+            temperature=0.4
         )
         respuesta = response.choices[0].message.content
 
@@ -127,11 +127,6 @@ def chat(consulta: Consulta):
         raise HTTPException(status_code=503, detail=f"Error al conectar con la IA: {str(e)}")
 
     frases_no_encontrado = [
-        "no tengo información",
-        "consultar directamente",
-        "no encuentro",
-        "no está en mi información",
-        "no puedo responder",
         "solo puedo responder"
     ]
     respondida = not any(f in respuesta.lower() for f in frases_no_encontrado)
