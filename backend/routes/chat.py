@@ -195,7 +195,7 @@ def chat(consulta: Consulta):
             model="llama-3.1-8b-instant",
             messages=mensajes,
             max_tokens=500,
-            temperature=0.3,
+            temperature=0.1,
             top_p=0.9
         )
         respuesta = response.choices[0].message.content
