@@ -1,4 +1,4 @@
-const API = 'http://127.0.0.1:8000';
+const API = 'https://preguntas-frecuentes-castores.onrender.com';
 let historial = [];
 let esperando = false;
 let sesionBloqueada = false;
@@ -218,10 +218,13 @@ function agregarMensaje(texto, tipo, sinRespuesta = false) {
 
   const bubbleClass = sinRespuesta ? 'msg-bubble no-answer' : 'msg-bubble';
 
+  function escaparHTML(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
   div.innerHTML = `
     ${avatar}
     <div class="msg-wrap">
-      <div class="${bubbleClass}">${texto}</div>
+      <div class="${bubbleClass}">${escaparHTML(texto)}</div>
       <div class="msg-time">${hora()}</div>
     </div>
   `;

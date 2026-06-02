@@ -164,6 +164,10 @@ def normalizar(texto: str) -> str:
 
     return texto
 
+def normalizar_simple(t):
+    t = unicodedata.normalize('NFD', t.lower())
+    return ''.join(c for c in t if unicodedata.category(c) != 'Mn')
+
 
 # --- Patrones de contenido inapropiado ---
 
@@ -213,7 +217,7 @@ def buscar_pregunta_relevante(consulta: str, preguntas: list) -> bool:
     palabras = [p for p in consulta_norm.split() if len(p) > 3]
 
     if not palabras:
-        return True
+        return False
 
     for item in preguntas:
         texto = normalizar(item["pregunta"] + " " + item["respuesta"])
@@ -313,7 +317,7 @@ def chat(consulta: Consulta):
         "no puedo responder ese tipo",
         "no tengo informacion",
     ]
-    respondida = not any(f in respuesta.lower() for f in frases_no_encontrado)
+    respondida = not any(f in normalizar_simple(respuesta) for f in frases_no_encontrado)
     guardar_metrica(consulta.mensaje, respondida)
 
     return {
