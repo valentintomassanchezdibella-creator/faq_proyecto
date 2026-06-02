@@ -1,6 +1,7 @@
-const API = 'https://preguntas-frecuentes-castores.onrender.com';
+const API = 'http://127.0.0.1:8000';
 let historial = [];
 let esperando = false;
+let sesionBloqueada = false;
 
 function hora() {
   return new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
@@ -48,8 +49,22 @@ function agregarError(msg) {
   scrollAbajo();
 }
 
+function bloquearSesion() {
+  sesionBloqueada = true;
+
+  const input  = document.getElementById('input-msg');
+  const boton  = document.getElementById('btn-send');
+
+  input.disabled    = true;
+  input.placeholder = 'Sesión bloqueada por reiteradas consultas inapropiadas.';
+  boton.disabled    = true;
+  boton.style.opacity = '0.4';
+  boton.style.cursor  = 'not-allowed';
+}
+
 async function enviarMensaje() {
-  if (esperando) return;
+  if (esperando || sesionBloqueada) return;
+
   const input = document.getElementById('input-msg');
   const texto = input.value.trim();
   if (!texto) return;
@@ -78,11 +93,17 @@ async function enviarMensaje() {
       agregarError(err.detail || 'Error al procesar la consulta.');
       document.getElementById('btn-send').disabled = false;
       esperando = false;
-      input.focus();
+      if (window.innerWidth > 768) {
+        input.focus();
+      }
       return;
     }
 
     const data = await res.json();
+
+    if (data.bloqueo_sesion) {
+      bloquearSesion();
+    }
 
     // Crear burbuja
     const area = document.getElementById('chat-area');
@@ -108,7 +129,6 @@ async function enviarMensaje() {
     const avatarWrap = div.querySelector('.msg-avatar');
     const palabras = data.respuesta.split(' ');
 
-    // Índices: palabra actual y letra dentro de esa palabra
     let iPalabra = 0;
     let iLetra   = 0;
 
@@ -118,15 +138,14 @@ async function enviarMensaje() {
         avatarWrap.classList.remove('pensando');
         fantasma.textContent = '';
         avatar.src = './imagenes/bot-normal.jpeg';
+
         return;
       }
 
       const palabraActual = palabras[iPalabra];
 
       if (iLetra <= palabraActual.length) {
-        // Escribiendo letras → icono hablando
         avatar.src = './imagenes/bot-hablando.jpeg';
-
         avatarWrap.classList.remove('pensando');
         avatarWrap.classList.add('hablando');
 
@@ -142,10 +161,8 @@ async function enviarMensaje() {
         fantasma.textContent = restoActual + siguientes;
 
         iLetra++;
-        scrollAbajo();
         setTimeout(escribir, 30);
       } else {
-        // Pausa entre palabras → icono normal
         avatar.src = './imagenes/bot-normal.jpeg';
         avatarWrap.classList.remove('hablando');
         iPalabra++;
@@ -162,9 +179,13 @@ async function enviarMensaje() {
     agregarError('No se pudo conectar con el servidor. Intentá de nuevo en un momento.');
   }
 
-  document.getElementById('btn-send').disabled = false;
+  if (!sesionBloqueada) {
+    document.getElementById('btn-send').disabled = false;
+    if (window.innerWidth > 768) {
+      document.getElementById('input-msg').focus();
+    }
+  }
   esperando = false;
-  input.focus();
 }
 
 function agregarTyping() {
@@ -210,6 +231,7 @@ function agregarMensaje(texto, tipo, sinRespuesta = false) {
 }
 
 function enviarSugerencia(texto) {
+  if (sesionBloqueada) return;
   document.getElementById('input-msg').value = texto;
   enviarMensaje();
 }
