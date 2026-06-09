@@ -187,10 +187,10 @@ function renderPreguntas() {
       <tr>
         <td style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:12px">${p.id}</td>
         <td data-label="Pregunta">${p.pregunta}</td>
-        <td data-label="Respuesta"><span class="respuesta-preview" style="color:var(--text-muted)" onclick="this.classList.toggle('expandida')" title="Click para expandir">${p.respuesta}</span></td>
-        <td>${p.categoria ? `<span class="badge badge-navy">${p.categoria}</span>` : '<span style="color:var(--text-light)">—</span>'}</td>
-        <td><span class="badge ${p.activa ? 'badge-success' : 'badge-danger'}">${p.activa ? 'Activa' : 'Inactiva'}</span></td>
-        <td>
+        <td data-label="Respuesta">${p.respuesta}</td>
+        <td data-label="Categoria">${p.categoria ? `<span class="badge badge-navy">${p.categoria}</span>` : '<span style="color:var(--text-light)">—</span>'}</td>
+        <td data-label="Estado"><span class="badge ${p.activa ? 'badge-success' : 'badge-danger'}">${p.activa ? 'Activa' : 'Inactiva'}</span></td>
+        <td data-label="Acciones">
           <div class="action-btns">
             <button class="btn-icon" title="Editar" onclick="openModalEditar(${p.id})">✏️</button>
             <button class="btn-icon success" title="${p.activa ? 'Desactivar' : 'Activar'}" onclick="togglePregunta(${p.id})">${p.activa ? '🔇' : '✅'}</button>
@@ -326,11 +326,11 @@ async function loadUsuarios() {
 
     tbody.innerHTML = data.map(u => `
       <tr>
-        <td>${u.nombre || '—'}</td>
+        <td data-label="Usuario">${u.nombre || '—'}</td>
         <td data-label="Email" style="color:var(--text-muted)">${u.email}</td>
-        <td><span class="badge ${u.rol === 'admin' ? 'badge-warning' : 'badge-info'}">${u.rol}</span></td>
-        <td style="color:var(--text-muted);font-size:12px">${u.creado_en ? new Date(u.creado_en).toLocaleDateString('es-AR') : '—'}</td>
-        <td>
+        <td data-label="Rol"><span class="badge ${u.rol === 'admin' ? 'badge-warning' : 'badge-info'}">${u.rol}</span></td>
+        <td data-label="Creado" style="color:var(--text-muted);font-size:12px">${u.creado_en ? new Date(u.creado_en).toLocaleDateString('es-AR') : '—'}</td>
+        <td data-label="Acciones">
           <div class="action-btns">
             <button class="btn-icon " title="Editar" onclick="openModalEditarUser('${u.email}')">✏️</button>
             <button class="btn-icon danger" title="Eliminar" onclick="confirmarEliminarUser('${u.email}')">🗑️</button>
