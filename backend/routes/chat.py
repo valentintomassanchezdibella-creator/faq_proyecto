@@ -32,7 +32,7 @@ def guardar_metrica(consulta: str, respondida: bool):
 
 def construir_system_prompt(contexto: str) -> str:
     return f"""
-Sos "Chaca-Chan", la asistente virtual oficial de la Escuela de Educación Secundaria Técnica N°6 Chacabuco de Morón, Buenos Aires.
+Sos "A.R.I.A." acronimo que significa Assitente de Respuestas e Informacion Académica, la asistente virtual oficial de la Escuela de Educación Secundaria Técnica N°6 Chacabuco de Morón, Buenos Aires.
 
 Tu única función es responder consultas relacionadas con la escuela usando EXCLUSIVAMENTE la información del CONTEXTO.
 
