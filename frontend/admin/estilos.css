@@ -1,21 +1,23 @@
 :root {
   /* ── Paleta del chatbot ── */
   --navy:         #1e3a5f;
-  --navy-mid:     #2d5282;
-  --navy-light:   #4a7fb5;
+  --navy-mid:     #14335c;
+  --navy-light:   #0f386144;
   --navy-dark:    #1a2f4a;
 
-  --gold:         #c8982a;
-  --gold-light:   #f0c75e;
+  --gold:         #ffbd23;
+  --gold-light:   #ecb935;
 
 
 
   --bg:           #456ea7;        /* fondo general */
-  --surface:      #567fa8;  /* cards y tablas */
+  --surface:      #7cb2e779;  /* cards y tablas */
   --surface2:     #526283; 
-  --fondo-focus-cambiar: blue;
-  --barra-cambiar: blue;
-  --barra-cambiar-fin: blue;
+
+  --bg-input: white;
+  --fondo-focus-cambiar: #a8bbd4;
+  --barra-cambiar: #FF85C0;
+  --barra-cambiar-fin: #ff5eac;
 
 
 
@@ -29,7 +31,7 @@
   --success:      #1d7a4a;
   --success-bg:   #e3f5ec;
   --danger:       #b53030;
-  --danger-bg:    #faeaea;
+  --danger-bg:    #ecb2b2;
   --warning:      #8a5f0a;
   --warning-bg:   #fef4d9;
   --info:         #1a5fa8;
@@ -145,7 +147,7 @@ body {
   font-family: inherit;
   font-size: 14px;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg-input);
   transition: border-color 0.15s;
   outline: none;
 }
@@ -369,7 +371,7 @@ body {
   border-radius: var(--radius);
   padding: 1.25rem;
   box-shadow: var(--shadow);
-  border-top: 3px solid var(--navy-light);
+  border-top: 3px solid var(--navy-dark);
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
@@ -600,12 +602,12 @@ tr:hover td { background: rgba(74,127,181,0.05); }
   font-family: inherit;
   font-size: 13px;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg-input);
   outline: none;
   transition: border-color 0.15s;
 }
 
-.search-input:focus { border-color: var(--navy-mid); background: blue; }
+.search-input:focus { border-color: var(--navy-mid); background: var(--fondo-focus-cambiar); }
 
 select.filter-select {
   padding: 8px 12px;
@@ -614,9 +616,13 @@ select.filter-select {
   font-family: inherit;
   font-size: 13px;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg-input);
   outline: none;
   cursor: pointer;
+
+  &:focus{
+    background: var(--fondo-focus-cambiar);
+  }
 }
 
 .btn-add {
@@ -678,7 +684,7 @@ select.filter-select {
   width: 28px; height: 28px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
-  background: transparent;
+  background-color: var(--bg-input);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -720,7 +726,7 @@ select.filter-select {
   font-family: inherit;
   font-size: 13.5px;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg-input);
   outline: none;
   transition: border-color 0.15s;
 }
@@ -740,17 +746,17 @@ select.filter-select {
 
 .btn-cancel {
   padding: 8px 18px;
-  background: transparent;
   color: var(--text-muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  background-color: var(--bg-input);
   font-family: inherit;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.12s;
 }
 
-.btn-cancel:hover { background: var(--surface2); color: var(--text); }
+.btn-cancel:hover { background: var(--fondo-focus-cambiar); color: var(--text); }
 
 .btn-save {
   padding: 8px 20px;
@@ -855,7 +861,7 @@ select.filter-select {
 
 .freq-text { flex: 1; font-size: 13px; }
 .freq-bar-wrap { width: 80px; }
-.freq-bar-bg { background: var(--surface2); height: 4px; border-radius: 2px; overflow: hidden; }
+.freq-bar-bg { background: var(--bg-input); height: 4px; border-radius: 2px; overflow: hidden; }
 .freq-bar { height: 4px; background: linear-gradient(90deg, var(--barra-cambiar), var(--barra-cambiar-fin)); border-radius: 2px; transition: width 0.4s ease; }
 
 .freq-count {
