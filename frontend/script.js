@@ -1,4 +1,4 @@
-const API = 'https://asistente-respuestas-info-academica.onrender.com';
+const API = 'https://preguntas-frecuentes-castores.onrender.com';
 let historial = [];
 let esperando = false;
 let sesionBloqueada = false;

@@ -1,4 +1,4 @@
-const API = 'https://asistente-respuestas-info-academica.onrender.com';
+const API = 'https://preguntas-frecuentes-castores.onrender.com';
 let token = localStorage.getItem('token') || '';
 let currentUser = null;
 let preguntasData = [];
