@@ -822,3 +822,19 @@ flex-shrink: 0;
     transform: translateY(-4px);
   }
 }
+
+.admin-link {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.admin-link:hover {
+    color: white;
+    background: rgba(255,255,255,0.15);
+}
