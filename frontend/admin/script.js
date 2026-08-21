@@ -135,13 +135,14 @@ function renderFrecuentes(lista) {
 
 // ─── PREGUNTAS ────────────────────────────────
 async function loadPreguntas() {
+  const savedPage = currentPage;
   try {
     const res = await apiFetch('/preguntas?incluir_inactivas=true&por_pagina=1000');
     if (!res || !res.ok) return;
     const data = await res.json();
     preguntasData = data.datos;
     filteredData  = [...preguntasData];
-    currentPage   = 1;
+    currentPage   = keepPage ? savedPage : 1;
     loadCategorias();
     renderPreguntas();
   } catch (e) {
@@ -168,7 +169,7 @@ function filterPreguntas() {
     const matchEst = est === '' || String(p.activa) === est;
     return matchQ && matchCat && matchEst;
   });
-  currentPage = 1;
+  if (!keepPage) currentPage = 1,
   renderPreguntas();
 }
 
@@ -269,7 +270,7 @@ async function guardarPregunta() {
     closeModal('modal-pregunta');
     await loadMetrics();
     toast(id ? 'Pregunta actualizada.' : 'Pregunta creada.', 'success');
-    await loadPreguntas();
+    await loadPreguntas(true);
   } catch (e) {
     toast('Error de conexión.', 'error');
   }
@@ -282,7 +283,7 @@ async function togglePregunta(id) {
     const data = await res.json();
     const p = preguntasData.find(x => x.id === id);
     if (p) p.activa = data.activa;
-    filterPreguntas();
+    filterPreguntas(true);
     await loadMetrics();
     toast(data.activa ? 'Pregunta activada.' : currentUser.rol === 'admin' ? 'Pregunta desactivada' : 'Pregunta desactivada <br> Recuerde que solo el admin puede eliminarla definitivamente', 'info');
   } catch (e) {
@@ -302,7 +303,7 @@ async function eliminarPregunta(id) {
     const res = await apiFetch(`/preguntas/${id}`, { method: 'DELETE' });
     if (!res || !res.ok) { toast('Error al eliminar.', 'error'); return; }
     preguntasData = preguntasData.filter(p => p.id !== id);
-    filterPreguntas();
+    filterPreguntas(true);
     await loadMetrics();
     toast('Pregunta eliminada.', 'success');
   } catch (e) {
