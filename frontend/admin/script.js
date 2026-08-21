@@ -134,15 +134,14 @@ function renderFrecuentes(lista) {
 }
 
 // ─── PREGUNTAS ────────────────────────────────
-async function loadPreguntas() {
-  const savedPage = currentPage;
+async function loadPreguntas(pageToRestore = currentPage) {
   try {
     const res = await apiFetch('/preguntas?incluir_inactivas=true&por_pagina=1000');
     if (!res || !res.ok) return;
     const data = await res.json();
     preguntasData = data.datos;
     filteredData  = [...preguntasData];
-    currentPage   = keepPage ? savedPage : 1;
+    currentPage   = pageToRestore;
     loadCategorias();
     renderPreguntas();
   } catch (e) {
@@ -159,7 +158,7 @@ function loadCategorias() {
     cats.map(c => `<option value="${c}" ${c === cur ? 'selected' : ''}>${c}</option>`).join('');
 }
 
-function filterPreguntas() {
+function filterPreguntas(resetPage = true) {
   const q     = document.getElementById('search-input').value.toLowerCase();
   const cat   = document.getElementById('cat-filter').value;
   const est   = document.getElementById('estado-filter').value;
@@ -169,7 +168,9 @@ function filterPreguntas() {
     const matchEst = est === '' || String(p.activa) === est;
     return matchQ && matchCat && matchEst;
   });
-  if (!keepPage) currentPage = 1,
+  if (resetPage){
+    currentPage = 1;
+  }
   renderPreguntas();
 }
 
@@ -243,7 +244,7 @@ function openModalEditar(id) {
   openModal('modal-pregunta');
 }
 
-async function guardarPregunta(keepPage = true) {
+async function guardarPregunta() {
   const id  = document.getElementById('edit-id').value;
   const preg = document.getElementById('edit-pregunta').value.trim();
   const resp = document.getElementById('edit-respuesta').value.trim();
@@ -270,20 +271,20 @@ async function guardarPregunta(keepPage = true) {
     closeModal('modal-pregunta');
     await loadMetrics();
     toast(id ? 'Pregunta actualizada.' : 'Pregunta creada.', 'success');
-    await loadPreguntas(true);
+    await loadPreguntas();
   } catch (e) {
     toast('Error de conexión.', 'error');
   }
 }
 
-async function togglePregunta(id, keepPage = true) {
+async function togglePregunta(id) {
   try {
     const res = await apiFetch(`/preguntas/${id}/toggle`, { method: 'PATCH' });
     if (!res || !res.ok) return;
     const data = await res.json();
     const p = preguntasData.find(x => x.id === id);
     if (p) p.activa = data.activa;
-    filterPreguntas(true);
+    filterPreguntas(false);
     await loadMetrics();
     toast(data.activa ? 'Pregunta activada.' : currentUser.rol === 'admin' ? 'Pregunta desactivada' : 'Pregunta desactivada <br> Recuerde que solo el admin puede eliminarla definitivamente', 'info');
   } catch (e) {
@@ -297,13 +298,13 @@ function confirmarEliminar(id, texto) {
   document.getElementById('confirm-overlay').classList.add('open');
 }
 
-async function eliminarPregunta(id, keepPage = true) {
+async function eliminarPregunta(id) {
   closeConfirm();
   try {
     const res = await apiFetch(`/preguntas/${id}`, { method: 'DELETE' });
     if (!res || !res.ok) { toast('Error al eliminar.', 'error'); return; }
     preguntasData = preguntasData.filter(p => p.id !== id);
-    filterPreguntas(true);
+    filterPreguntas(false);
     await loadMetrics();
     toast('Pregunta eliminada.', 'success');
   } catch (e) {
