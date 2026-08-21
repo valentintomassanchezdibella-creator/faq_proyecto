@@ -243,7 +243,7 @@ function openModalEditar(id) {
   openModal('modal-pregunta');
 }
 
-async function guardarPregunta() {
+async function guardarPregunta(keepPage = true) {
   const id  = document.getElementById('edit-id').value;
   const preg = document.getElementById('edit-pregunta').value.trim();
   const resp = document.getElementById('edit-respuesta').value.trim();
@@ -276,7 +276,7 @@ async function guardarPregunta() {
   }
 }
 
-async function togglePregunta(id) {
+async function togglePregunta(id, keepPage = true) {
   try {
     const res = await apiFetch(`/preguntas/${id}/toggle`, { method: 'PATCH' });
     if (!res || !res.ok) return;
@@ -297,7 +297,7 @@ function confirmarEliminar(id, texto) {
   document.getElementById('confirm-overlay').classList.add('open');
 }
 
-async function eliminarPregunta(id) {
+async function eliminarPregunta(id, keepPage = true) {
   closeConfirm();
   try {
     const res = await apiFetch(`/preguntas/${id}`, { method: 'DELETE' });
