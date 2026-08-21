@@ -11,7 +11,7 @@
 
 
   --bg:           #456ea7;        /* fondo general */
-  --surface:      #7cb2e779;  /* cards y tablas */
+  --surface:      #549AC5;  /* cards y tablas */
   --surface2:     #526283; 
 
   --bg-input: white;
@@ -22,7 +22,7 @@
 
 
 
-  --border:       #dde3f0;
+  --border:       #000000;
 
   --text:         #0f2044;
   --text-muted:   #0f2044;
